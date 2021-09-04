@@ -1,11 +1,12 @@
 import './App.css';
-import GeoMap from './components/GeoMap';
+import RegisterName from './components/RegisterName';
+
 
 
 function App() {
   return (
     <div className="App">
-      <GeoMap />
+      <RegisterName />
     </div>
   );
 }

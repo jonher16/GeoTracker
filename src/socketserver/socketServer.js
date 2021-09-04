@@ -1,40 +1,31 @@
 const express = require("express");
 const http = require("http");
-const socketIo = require("socket.io");
-
+const app = express()
 const port = process.env.PORT || 4001;
-const index = require("./index");
-
-const app = express();
-app.use(index);
-
 const server = http.createServer(app);
-
+const socketIo = require("socket.io");
 const io = socketIo(server);
 
-let interval;
-
+var history = [];
 io.on("connection", (socket) => {
-  console.log("New client connected");
-  if (interval) {
-    clearInterval(interval);
-  }
-  interval = setInterval(() => getApiAndEmit(socket), 1000);
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-    clearInterval(interval);
-  });
-  socket.on("userCoords", coords => {
-      console.log(coords.lat, coords.lng)
-      var newCoords = {lat: coords.lat+1, lng: coords.lng+1}
-    socket.broadcast.emit("newUserCoordinates", newCoords)
-      
+
+  var usuario = "";
+  
+  socket.on("conectado", (username, coordinates) =>{
+     usuario = username
+     history.push({username, coordinates});
+     console.log(`${usuario} se conectó`)
+     console.log("New History Coordinates => ",history)
+     io.emit("mensaje", `${usuario} se conectó`)
+     io.emit("coordenadas", history)
   })
+
+  socket.on("disconnect", () => {
+    console.log(`${usuario} se desconectó`)
+    socket.broadcast.emit("mensaje", `${usuario} se desconectó`)
+   });
+
 });
 
-const getApiAndEmit = socket => {
-  const response =  new Date();
-  socket.emit("FromAPI", response);
-};
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
