@@ -12,6 +12,7 @@ const RegisterName = () => {
       setRegistered(true);
     }
   };
+  
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       function (position) {
@@ -19,14 +20,31 @@ const RegisterName = () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         });
-        console.log("localCoords =>", position.coords);
+        console.log("localCoordsUpdated =>", position.coords);
       },
       function (error) {
         console.log(error);
       },
       { enableHighAccuracy: true }
     );
+    setInterval(() => {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          setCoords({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+          console.log("localCoordsUpdated =>", position.coords);
+        },
+        function (error) {
+          console.log(error);
+        },
+        { enableHighAccuracy: true }
+      );
+    }, 15000)
   }, [])
+
+  
 
   return (
     <div>

@@ -18,9 +18,12 @@ const GeoMap = ({ username, coords }) => {
   const [mensaje1, setMensaje1] = useState("");
 
   useEffect(() => {
-    socket.emit("conectado", username, coords);
-    return () => {};
-  }, [coords]);
+    socket.emit("conectado", username);
+  }, [username]);
+  
+  useEffect(() => {
+    socket.emit("refreshCoordenadas", username, coords)
+  },[coords])
 
   useEffect(() => {
     socket.on("coordenadas", (coordinates) => {
@@ -44,8 +47,8 @@ const GeoMap = ({ username, coords }) => {
 
   useEffect(() => {
     for(let i in socketCoords){
-      console.log("socketcoords usestate => ", socketCoords[i])
-      console.log("socketcoords usestate => ", socketCoords[i].coordinates.lat)
+      //console.log("socketcoords usestate => ", socketCoords[i])
+      //console.log("socketcoords usestate => ", socketCoords[i].coordinates.lat)
       //console.log("socketcoords usestate =>", socketCoords[i].username, socketCoords[i].coordinates.lat, socketCoords[i].coordinates.lng);
     }
     
