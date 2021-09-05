@@ -7,6 +7,7 @@ const socketIo = require("socket.io");
 const io = socketIo(server);
 
 var history = [];
+var filteredHistory = [];
 io.on("connection", (socket) => {
 
   var usuario = "";
@@ -23,6 +24,11 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log(`${usuario} se desconectó`)
     socket.broadcast.emit("mensaje", `${usuario} se desconectó`)
+    filteredHistory = history.filter(item=>(item.username !== usuario))
+    history = filteredHistory
+    filteredHistory = []
+    console.log("history filtered =>", history)
+    io.emit("coordenadas", history)
    });
 
 });
