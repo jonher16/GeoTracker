@@ -3,7 +3,10 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { makeStyles } from "@material-ui/core";
 import L from "leaflet";
-import socket from "../socketserver/socket";
+import io from "socket.io-client";
+
+const ENDPOINT = "http://127.0.0.1:4001";
+const socket = io(ENDPOINT);
 
 var myIcon = L.icon({
   iconUrl:
