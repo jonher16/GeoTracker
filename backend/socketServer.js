@@ -4,7 +4,12 @@ const app = express();
 const port = process.env.PORT || 4001;
 const server = http.createServer(app);
 const socketIo = require("socket.io");
-const io = socketIo(server);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 var history = [];
 var filteredHistory = [];
@@ -13,8 +18,8 @@ io.on("connection", (socket) => {
 
   socket.on("conectado", (username) => {
     usuario = username;
-    console.log(`${usuario} se conectó`);
-    io.emit("mensaje", `${usuario} se conectó`);
+    console.log(`${usuario} connected`);
+    io.emit("mensaje", `${usuario} connected`);
   });
 
   socket.on("refreshCoordenadas", (username, coordinates) => {
@@ -27,8 +32,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`${usuario} se desconectó`);
-    socket.broadcast.emit("mensaje", `${usuario} se desconectó`);
+    console.log(`${usuario} disconnected`);
+    socket.broadcast.emit("mensaje", `${usuario} connected`);
     filteredHistory = history.filter((item) => item.username !== usuario);
     history = filteredHistory;
     filteredHistory = [];
