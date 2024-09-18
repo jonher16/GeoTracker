@@ -3,42 +3,45 @@ const http = require("http");
 const app = express();
 const port = process.env.PORT || 4001;
 const server = http.createServer(app);
-const socketIo = require("socket.io");
-const io = require("socket.io")(server, {
+const { Server } = require("socket.io");
+const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
   },
 });
 
-var history = [];
-var filteredHistory = [];
+let history = [];
+
 io.on("connection", (socket) => {
-  var usuario = "";
+  let user = "";
 
-  socket.on("conectado", (username) => {
-    usuario = username;
-    console.log(`${usuario} connected`);
-    io.emit("mensaje", `${usuario} connected`);
+  // When a user connects
+  socket.on("connected", (username) => {
+    user = username;
+    console.log(`${user} connected`);
+    io.emit("message", `${user} connected`);
+
+    // Send the existing markers to the newly connected client
+    socket.emit("coordinates", history);
   });
 
-  socket.on("refreshCoordenadas", (username, coordinates) => {
-    filteredHistory = history.filter((item) => item.username !== usuario);
-    history = filteredHistory;
-    filteredHistory = [];
-    history.push({ username, coordinates });
-    console.log("New History Coordinates => ", history);
-    io.emit("coordenadas", history);
+  // Refresh coordinates and message
+  socket.on("refreshCoordinates", (username, coordinates, message) => {
+    console.log(`Received coordinates from ${username}:`, coordinates, message);
+    history = history.filter((item) => item.username !== username);
+    history.push({ username, coordinates, message });
+    console.log("Updated History => ", history);
+    io.emit("coordinates", history); // Broadcast updated history to all clients
   });
 
+  // When a user disconnects
   socket.on("disconnect", () => {
-    console.log(`${usuario} disconnected`);
-    socket.broadcast.emit("mensaje", `${usuario} connected`);
-    filteredHistory = history.filter((item) => item.username !== usuario);
-    history = filteredHistory;
-    filteredHistory = [];
-    console.log("history filtered =>", history);
-    io.emit("coordenadas", history);
+    console.log(`${user} disconnected`);
+    io.emit("message", `${user} disconnected`);
+    history = history.filter((item) => item.username !== user);
+    console.log("Filtered History =>", history);
+    io.emit("coordinates", history);
   });
 });
 

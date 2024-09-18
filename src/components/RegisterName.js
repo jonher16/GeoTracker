@@ -1,60 +1,78 @@
 import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import GeoMap from "./GeoMap";
-import map from "../images/mapblue.jpg"
-
+import map from "../images/mapblue.jpg";
 
 const useStyles = makeStyles((theme) => ({
-  page: {
-    justifyContent: "center",
-    padding: theme.spacing(10),
+  registrationRoot: {
+    minHeight: "100vh",
     display: "flex",
-    flexDirection: "column",
+    justifyContent: "center",
     alignItems: "center",
-    maxWidth: "100%",
-    height: "72.3vh",
     backgroundImage: `url(${map})`,
     backgroundPosition: "center",
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
   },
-  title : {
-    maxWidth: "100%",
-    minWidth: "90vw",
-    fontWeight: "bold",
-    justifyContent: "center",
-    marginBottom: "5vh",
-    textAlign: "center",
-    backgroundColor: "rgba(63,81,181,0.7)",
-    borderRadius: "2vh",
-    shadow: "2vh",
-    fontSize: "4rem",
-    [theme.breakpoints.down('sm')]: {
-      fontSize: "2rem",
-    },
-    [theme.breakpoints.down('xs')]: {
-      fontSize: "1.5rem",
-      minWidth: "40vw"
-    }
-  },
-  form : {
-    justifyContent: "center",
+  page: {
     display: "flex",
     flexDirection: "column",
-    
+    alignItems: "center",
+    padding: theme.spacing(4),
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    borderRadius: "12px",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.4)",
+  },
+  title: {
+    color: "white",
+    fontWeight: "bold",
+    marginBottom: theme.spacing(4),
+    textAlign: "center",
+    fontSize: "3rem",
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "2rem",
+    },
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "1.5rem",
+    },
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    maxWidth: "400px",
+  },
+  textField: {
+    marginBottom: theme.spacing(2),
+    "& .MuiFilledInput-root": {
+      backgroundColor: "rgba(63,81,181,0.7)",
+      color: "white",
+    },
+    "& .MuiInputLabel-root": {
+      color: "white",
+    },
+    "& .MuiFilledInput-underline:before": {
+      borderBottom: "2px solid white",
+    },
+    "& .MuiFilledInput-underline:after": {
+      borderBottom: "2px solid white",
+    },
   },
   button: {
-    marginTop: "2",
+    marginTop: theme.spacing(2),
+    backgroundColor: "#3f51b5",
+    color: "white",
+    "&:hover": {
+      backgroundColor: "#303f9f",
+    },
   },
-  textfield: {
-    color: "white"
-  }
 }));
+
 const RegisterName = () => {
   const classes = useStyles();
   const [username, setUsername] = useState("");
   const [registered, setRegistered] = useState(false);
-  const [coords, setCoords] = useState({});
+  const [coords, setCoords] = useState(null);
 
   const register = (e) => {
     e.preventDefault();
@@ -64,64 +82,63 @@ const RegisterName = () => {
   };
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      function (position) {
-        setCoords({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-        console.log("localCoordsUpdated =>", position.coords);
-      },
-      function (error) {
-        console.log(error);
-      },
-      { enableHighAccuracy: true }
-    );
-    setInterval(() => {
+    const updateCoordinates = () => {
       navigator.geolocation.getCurrentPosition(
-        function (position) {
+        (position) => {
           setCoords({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
           console.log("localCoordsUpdated =>", position.coords);
         },
-        function (error) {
+        (error) => {
           console.log(error);
         },
         { enableHighAccuracy: true }
       );
+    };
+
+    updateCoordinates();
+
+    const interval = setInterval(() => {
+      updateCoordinates();
     }, 15000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <div>
-      {!registered && (
+    <div className={registered ? "" : classes.registrationRoot}>
+      {!registered ? (
         <div className={classes.page}>
-          <Typography className={classes.title} >Real Time Client Positioning Map</Typography>
+          <Typography className={classes.title}>
+            Real Time Client Positioning Map
+          </Typography>
           <form className={classes.form} onSubmit={register}>
-            <TextField classname={classes.textfield}
+            <TextField
               id="outlined-basic"
               label="Name"
-              style={{
-                backgroundColor: "rgba(63,81,181,0.7)",
-            }}
-            InputProps={{
-              style: {
-                  color: "white"
-              }
-          }}
               variant="filled"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              className={classes.textField}
             />
-            <Button className={classes.button} variant="contained" color="primary" onClick={register}>
+            <Button
+              className={classes.button}
+              variant="contained"
+              type="submit"
+            >
               Go to map
             </Button>
           </form>
         </div>
+      ) : (
+        coords && (
+          <div style={{ height: "100vh", width: "100vw" }}>
+            <GeoMap username={username} coords={coords} />
+          </div>
+        )
       )}
-      {registered && <GeoMap username={username} coords={coords} />}
     </div>
   );
 };
