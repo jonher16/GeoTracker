@@ -21,7 +21,7 @@
   "scripts": {
     "start-react": "set NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
     "start-socket": "node backend/socketServer.js",
-    "start": "concurrently \"npm run start-react\" \"npm run start-socket\"",
+    "start": "concurrently \"npm run start-react\"",
     "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
