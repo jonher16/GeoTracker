@@ -26,9 +26,21 @@ const useStyles = makeStyles((theme) => ({
   title: {
     color: "white",
     fontWeight: "bold",
-    marginBottom: theme.spacing(4),
+    marginBottom: theme.spacing(2),
     textAlign: "center",
     fontSize: "3rem",
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "2rem",
+    },
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "1.5rem",
+    },
+  },
+  subtitle: {
+    color: "white",
+    marginBottom: theme.spacing(2),
+    textAlign: "center",
+    fontSize: "1rem",
     [theme.breakpoints.down("sm")]: {
       fontSize: "2rem",
     },
@@ -112,7 +124,10 @@ const RegisterName = () => {
       {!registered ? (
         <div className={classes.page}>
           <Typography className={classes.title}>
-            Real Time Client Positioning Map
+            GeoComments
+          </Typography>
+          <Typography className={classes.subtitle}>
+            Register you comment in the map!
           </Typography>
           <form className={classes.form} onSubmit={register}>
             <TextField
