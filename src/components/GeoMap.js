@@ -153,7 +153,7 @@ const SetMapCenter = ({ coords, initialCenter, setInitialCenter, prevCoords }) =
       map.setView([coords.lat, coords.lng], 13);
       prevCoords.current = coords;
     }
-  }, [coords, map, initialCenter, setInitialCenter]);
+  }, [coords, map, initialCenter, setInitialCenter, prevCoords]); // Added prevCoords as a dependency
 
   return null;
 };
